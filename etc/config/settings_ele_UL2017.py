@@ -18,6 +18,8 @@ flags = {
     'passingMVA94XwpLisoV2'    : '(passingMVA94XwpLisoV2 == 1)',
     'passingMVA94XwpLnoisoV2'  : '(passingMVA94XwpLnoisoV2 == 1)',
     'passingMVA94XwpHZZisoV2'  : '(passingMVA94XwpHZZisoV2 == 1)',
+    'passingMVA94XwpHZZisoV2'  : '(passingMVA94XwpHZZisoV2 == 1)',
+    'passHltEle32DoubleEGWPTightGsf'  : '(passHltEle32DoubleEGWPTightGsf== 1)',
     }
 
 baseOutDir = 'results/UL2017/tnpEleID/'
@@ -85,7 +87,7 @@ biningDef = [
 ########## Cuts definition for all samples
 #############################################################
 ### cut
-cutBase   = 'tag_Ele_pt > 35 && abs(tag_sc_eta) < 2.17 && el_q*tag_Ele_q < 0'
+cutBase   = 'tag_Ele_pt > 27 && abs(tag_sc_eta) < 2.17 && el_q*tag_Ele_q < 0 && passingMVA94Xwp80noisoV2==1'
 
 additionalCuts = { 
     0 : 'tag_Ele_trigMVA > 0.92 ',

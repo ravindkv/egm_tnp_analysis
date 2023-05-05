@@ -54,6 +54,8 @@ make
 
 Everything will be done for a specific flag (so the settings can be the same for different flags). Hence, the flag to be used must be specified each time (named myWP in following).
 
+For AN2021_224, myWP = passHltEle27WPTightGsf (2016), passHltEle32DoubleEGWPTightGsf (2017), passHltEle32WPTightGsf (2018)
+
 1. **Create the bining:** To each bin is associated a cut that can be tuned bin by bin in the `settings.py`
 2. After setting up the `settings.py` check bins
 
