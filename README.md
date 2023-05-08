@@ -15,7 +15,7 @@ Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 cmsrel CMSSW_11_2_0
 cd CMSSW_11_2_0/src
 cmsenv
-git clone git@github.com:cms-egamma/egm_tnp_analysis.git
+git clone git@github.com:ravindkv/egm_tnp_analysis.git 
 cd egm_tnp_analysis
 make 
 ```

@@ -404,6 +404,9 @@ class efficiencyList:
                 effAverage = self.effList[ptBin][etaBin]
                 aValue  = effAverage.effData
                 anError = effAverage.systCombined 
+                if effAverage.effMC == 0.0:
+                    print("Warning, effMC is zero, setting it to 1e-05")
+                    effAverage.effMC = 1e-05
                 if typeGR == 1:
                     aValue  = effAverage.effData      / effAverage.effMC
                     anError = effAverage.systCombined / effAverage.effMC  

@@ -30,7 +30,7 @@ baseOutDir = 'results/UL2017/tnpEleID/'
 ### samples are defined in etc/inputs/tnpSampleDef.py
 ### not: you can setup another sampleDef File in inputs
 import etc.inputs.tnpSampleDef as tnpSamples
-tnpTreeDir = 'tnpEleIDs'
+tnpTreeDir = 'tnpEleTrig'
 
 samplesDef = {
     'data'   : tnpSamples.UL2017['data_Run2017B'].clone(),
@@ -103,7 +103,7 @@ additionalCuts = {
 }
 
 #### or remove any additional cut (default)
-#additionalCuts = None
+additionalCuts = None
 
 #############################################################
 ########## fitting params to tune fit by hand if necessary
