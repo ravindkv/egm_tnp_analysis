@@ -19,7 +19,7 @@ flags = {
     'passingMVA94XwpLnoisoV2'  : '(passingMVA94XwpLnoisoV2 == 1)',
     'passingMVA94XwpHZZisoV2'  : '(passingMVA94XwpHZZisoV2 == 1)',
     'passingMVA94XwpHZZisoV2'  : '(passingMVA94XwpHZZisoV2 == 1)',
-    'passHltEle32DoubleEGWPTightGsf'  : '(passHltEle32DoubleEGWPTightGsf== 1)',
+    'passHltEle32DoubleEGWPTightGsf'  : '(passHltEle32DoubleEGWPTightGsf== 1 && passEGL1SingleEGOr==1)',
     }
 
 baseOutDir = 'results/UL2017/tnpEleID/'
