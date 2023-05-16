@@ -22,7 +22,7 @@ flags = {
     'passHltEle32DoubleEGWPTightGsf'  : '(passHltEle32DoubleEGWPTightGsf== 1 && passEGL1SingleEGOr==1)',
     }
 
-baseOutDir = 'results/UL2017/tnpEleID/'
+baseOutDir = 'results/UL2017/tnpEleTrig/'
 
 #############################################################
 ########## samples definition  - preparing the samples
@@ -78,7 +78,7 @@ if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('/eos/cms/s
 #############################################################
 biningDef = [
    { 'var' : 'el_sc_eta' , 'type': 'float', 'bins': [-2.5,-2.0,-1.566,-1.4442, -0.8, 0.0, 0.8, 1.4442, 1.566, 2.0, 2.5] },
-   { 'var' : 'el_pt' , 'type': 'float', 'bins': [10,20,35,50,100,200,500] },
+   { 'var' : 'el_pt' , 'type': 'float', 'bins': [25,28,32,35,50,100,200,500] },
 
 
 ]
@@ -87,7 +87,8 @@ biningDef = [
 ########## Cuts definition for all samples
 #############################################################
 ### cut
-cutBase   = 'tag_Ele_pt > 27 && abs(tag_sc_eta) < 2.17 && el_q*tag_Ele_q < 0 && passingMVA94Xwp80noisoV2==1'
+#cutBase   = 'tag_Ele_pt > 27 && abs(tag_sc_eta) < 2.17 && el_q*tag_Ele_q < 0 && passingMVA94Xwp80noisoV2==1'
+cutBase   = 'tag_Ele_pt > 27 && abs(tag_sc_eta) < 2.17 && el_q*tag_Ele_q < 0 && passingMVA94Xwp90noisoV2==1'
 
 additionalCuts = { 
     0 : 'tag_Ele_trigMVA > 0.92 ',
