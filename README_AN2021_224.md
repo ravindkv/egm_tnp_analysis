@@ -3,8 +3,9 @@
 cmsrel CMSSW_11_2_0
 cd CMSSW_11_2_0/src
 cmsenv
-git clone git@github.com:ravindkv/egm_tnp_analysis.git 
+git clone git@github.com:idas/egm_tnp_analysis.git 
 cd egm_tnp_analysis
+git checkout AN2021_224
 make 
 ```
 For 2016PreVFP:
