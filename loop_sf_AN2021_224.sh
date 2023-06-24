@@ -73,3 +73,35 @@ do
     `$command`
 
 done
+
+for settings in ${settingslist}
+do
+    command="python2.7 tnpEGM_fitter.py etc/config/settings_ele_${settings}_wpl.py --flag passingMVA94XwpLnoisoV2 --createBins"
+    echo Executing command : $command
+    `$command`
+
+    command="python2.7 tnpEGM_fitter.py etc/config/settings_ele_${settings}_wpl.py --flag passingMVA94XwpLnoisoV2 --createHists"
+    echo Executing command : $command
+    `$command`
+
+    command="python2.7 tnpEGM_fitter.py etc/config/settings_ele_${settings}_wpl.py --flag passingMVA94XwpLnoisoV2 --doFit"
+    echo Executing command : $command
+    `$command`
+
+    command="python2.7 tnpEGM_fitter.py etc/config/settings_ele_${settings}_wpl.py --flag passingMVA94XwpLnoisoV2 --doFit --mcSig --altSig"
+    echo Executing command : $command
+    `$command`
+
+    command="python2.7 tnpEGM_fitter.py etc/config/settings_ele_${settings}_wpl.py --flag passingMVA94XwpLnoisoV2 --doFit --altSig"
+    echo Executing command : $command
+    `$command`
+    
+    command="python2.7 tnpEGM_fitter.py etc/config/settings_ele_${settings}_wpl.py --flag passingMVA94XwpLnoisoV2 --doFit --altBkg"
+    echo Executing command : $command
+    `$command`
+
+    command="python2.7 tnpEGM_fitter.py etc/config/settings_ele_${settings}_wpl.py --flag passingMVA94XwpLnoisoV2 --sumUp"
+    echo Executing command : $command
+    `$command`
+
+done

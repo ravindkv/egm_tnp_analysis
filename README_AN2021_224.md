@@ -8,7 +8,7 @@ cd egm_tnp_analysis
 git checkout AN2021_224
 make 
 ```
-Trigger scale factor :
+## Trigger scale factor :
 
 For 2016PreVFP:
  * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2016_preVFP.py  --flag passHltEle27WPTightGsf --createBins
@@ -30,7 +30,7 @@ For 2018:
  * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2018.py  --flag passHltEle32WPTightGsf  --createHists
 
 
-Isolation scale factor :
+## Isolation scale factor :
 
 For 2016PreVFP:
  * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2016_preVFP_iso.py  --flag passiso --createBins
@@ -51,4 +51,26 @@ For 2018:
  * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2018_iso.py  --flag passiso  --createBins
  * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2018_iso.py  --flag passiso  --createHists
  * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2018_iso.py  --flag passiso  --doFit --sumUp
+
+## MVA Loose WP scale factor :
+
+For 2016PreVFP:
+ * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2016_preVFP_wpl.py  --flag passingMVA94XwpLnoisoV2 --createBins
+ * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2016_preVFP_wpl.py  --flag passingMVA94XwpLnoisoV2 --createHists
+ * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2016_preVFP_wpl.py  --flag passingMVA94XwpLnoisoV2 --doFit --sumUp
+
+For 2016PostVFP:
+ * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2016_postVFP_wpl.py  --flag passingMVA94XwpLnoisoV2 --createBins
+ * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2016_postVFP_wpl.py  --flag passingMVA94XwpLnoisoV2 --createHists
+ * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2016_postVFP_wpl.py  --flag passingMVA94XwpLnoisoV2 --doFit --sumUp
+
+For 2017:
+ * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2017_wpl.py  --flag passingMVA94XwpLnoisoV2 --createBins
+ * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2017_wpl.py  --flag passingMVA94XwpLnoisoV2 --createHists
+ * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2017_wpl.py  --flag passingMVA94XwpLnoisoV2 --doFit --sumUp
+
+For 2018:
+ * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2018_wpl.py  --flag passingMVA94XwpLnoisoV2  --createBins
+ * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2018_wpl.py  --flag passingMVA94XwpLnoisoV2  --createHists
+ * python2.7 tnpEGM_fitter.py etc/config/settings_ele_UL2018_wpl.py  --flag passingMVA94XwpLnoisoV2  --doFit --sumUp
 
