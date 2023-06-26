@@ -18,10 +18,11 @@ flags = {
     'passingMVA94XwpLisoV2'    : '(passingMVA94XwpLisoV2 == 1)',
     'passingMVA94XwpLnoisoV2'  : '(passingMVA94XwpLnoisoV2 == 1)',
     'passingMVA94XwpHZZisoV2'  : '(passingMVA94XwpHZZisoV2 == 1)',
-    'passHltEle32WPTightGsf'  : '(passHltEle32WPTightGsf == 1)',
+    'passHltEle27WPTightGsf'  : '(passHltEle27WPTightGsf== 1)',
+    'passiso'  : '(abs(el_sc_eta)<1.479 && abs(el_dxy)<0.05 && abs(el_dz)<0.1 && el_relIso03_dB<0.0821) || (abs(el_sc_eta)>1.479 && abs(el_dxy)<0.1 && abs(el_dz)<0.2 && el_relIso03_dB<0.0695)',
     }
 
-baseOutDir = 'results/UL2018/tnpEleTrig/'
+baseOutDir = 'results/UL2016_preVFP/tnpEleIso'
 
 #############################################################
 ########## samples definition  - preparing the samples
@@ -32,16 +33,17 @@ import etc.inputs.tnpSampleDef as tnpSamples
 tnpTreeDir = 'tnpEleTrig'
 
 samplesDef = {
-    'data'   : tnpSamples.UL2018['data_Run2018A'].clone(),
-    'mcNom'  : tnpSamples.UL2018['DY_amcatnloext'].clone(),
-    'mcAlt'  : tnpSamples.UL2018['DY_madgraph'].clone(),
-    'tagSel' : tnpSamples.UL2018['DY_amcatnloext'].clone(),
+    'data'   : tnpSamples.UL2016_preVFP['data_Run2016B'].clone(),
+    'mcNom'  : tnpSamples.UL2016_preVFP['DY_amcatnloext'].clone(),
+    'mcAlt'  : tnpSamples.UL2016_preVFP['DY_madgraph'].clone(),
+    'tagSel' : tnpSamples.UL2016_preVFP['DY_amcatnloext'].clone(),
 }
 
 ## can add data sample easily
-samplesDef['data'].add_sample( tnpSamples.UL2018['data_Run2018B'] )
-samplesDef['data'].add_sample( tnpSamples.UL2018['data_Run2018C'] )
-samplesDef['data'].add_sample( tnpSamples.UL2018['data_Run2018D'] )
+samplesDef['data'].add_sample( tnpSamples.UL2016_preVFP['data_Run2016C'] )
+samplesDef['data'].add_sample( tnpSamples.UL2016_preVFP['data_Run2016D'] )
+samplesDef['data'].add_sample( tnpSamples.UL2016_preVFP['data_Run2016E'] )
+samplesDef['data'].add_sample( tnpSamples.UL2016_preVFP['data_Run2016F'] )
 
 ## some sample-based cuts... general cuts defined here after
 ## require mcTruth on MC DY samples and additional cuts
@@ -62,13 +64,13 @@ if not samplesDef['tagSel'] is None:
 
 
 ## set MC weight, can use several pileup rw for different data taking periods
-weightName = 'weights_2018_runABCD.totWeight'
+weightName = 'weights_2016_run2016.totWeight'
 if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
 if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
-if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('/eos/cms/store/group/phys_egamma/asroy/Tag-and-Probe_Tree/UL2018_MINIAOD_Nm1/PU_Trees/DY_amcatnloext_ele.pu.puTree.root')
-if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('/eos/cms/store/group/phys_egamma/asroy/Tag-and-Probe_Tree/UL2018_MINIAOD_Nm1/PU_Trees/DY_madgraph_ele.pu.puTree.root')
-if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('/eos/cms/store/group/phys_egamma/asroy/Tag-and-Probe_Tree/UL2018_MINIAOD_Nm1/PU_Trees/DY_amcatnloext_ele.pu.puTree.root')
+if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('/eos/cms/store/group/phys_egamma/asroy/Tag-and-Probe_Tree/UL2016/PU_Trees/preVFP/DY_amcatnloext_ele.pu.puTree.root')
+if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('/eos/cms/store/group/phys_egamma/asroy/Tag-and-Probe_Tree/UL2016/PU_Trees/preVFP/DY_madgraph_ele.pu.puTree.root')
+if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('/eos/cms/store/group/phys_egamma/asroy/Tag-and-Probe_Tree/UL2016/PU_Trees/preVFP/DY_amcatnloext_ele.pu.puTree.root')
 
 
 #############################################################
@@ -76,7 +78,7 @@ if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('/eos/cms/s
 #############################################################
 biningDef = [
    { 'var' : 'el_sc_eta' , 'type': 'float', 'bins': [-2.5,-2.0,-1.566,-1.4442, -0.8, 0.0, 0.8, 1.4442, 1.566, 2.0, 2.5] },
-   { 'var' : 'el_pt' , 'type': 'float', 'bins': [35,50,100,200,500] },
+   { 'var' : 'el_pt' , 'type': 'float', 'bins': [30,35,50,100,200,500] },
 
 
 ]
@@ -86,7 +88,7 @@ biningDef = [
 #############################################################
 ### cut
 #cutBase   = 'tag_Ele_pt > 35 && abs(tag_sc_eta) < 2.17 && el_q*tag_Ele_q < 0 && passingMVA94Xwp80noisoV2==1'
-cutBase   = 'tag_Ele_pt > 35 && abs(tag_sc_eta) < 2.17 && el_q*tag_Ele_q < 0 && passingMVA94Xwp90noisoV2==1'
+cutBase   = 'tag_Ele_pt > 35 && abs(tag_sc_eta) < 2.17 && el_q*tag_Ele_q < 0 && passingMVA94Xwp90noisoV2==1 && passHltEle27WPTightGsf==1'
 
 additionalCuts = { 
     0 : 'tag_Ele_trigMVA > 0.92 ',

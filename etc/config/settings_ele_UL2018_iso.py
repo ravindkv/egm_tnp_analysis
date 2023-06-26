@@ -19,9 +19,10 @@ flags = {
     'passingMVA94XwpLnoisoV2'  : '(passingMVA94XwpLnoisoV2 == 1)',
     'passingMVA94XwpHZZisoV2'  : '(passingMVA94XwpHZZisoV2 == 1)',
     'passHltEle32WPTightGsf'  : '(passHltEle32WPTightGsf == 1)',
+    'passiso'  : '(abs(el_sc_eta)<1.479 && abs(el_dxy)<0.05 && abs(el_dz)<0.1 && el_relIso03_dB<0.0821) || (abs(el_sc_eta)>1.479 && abs(el_dxy)<0.1 && abs(el_dz)<0.2 && el_relIso03_dB<0.0695)',
     }
 
-baseOutDir = 'results/UL2018/tnpEleTrig/'
+baseOutDir = 'results/UL2018/tnpEleIso'
 
 #############################################################
 ########## samples definition  - preparing the samples
@@ -86,7 +87,7 @@ biningDef = [
 #############################################################
 ### cut
 #cutBase   = 'tag_Ele_pt > 35 && abs(tag_sc_eta) < 2.17 && el_q*tag_Ele_q < 0 && passingMVA94Xwp80noisoV2==1'
-cutBase   = 'tag_Ele_pt > 35 && abs(tag_sc_eta) < 2.17 && el_q*tag_Ele_q < 0 && passingMVA94Xwp90noisoV2==1'
+cutBase   = 'tag_Ele_pt > 35 && abs(tag_sc_eta) < 2.17 && el_q*tag_Ele_q < 0 && passingMVA94Xwp90noisoV2==1 && passHltEle32WPTightGsf==1'
 
 additionalCuts = { 
     0 : 'tag_Ele_trigMVA > 0.92 ',
