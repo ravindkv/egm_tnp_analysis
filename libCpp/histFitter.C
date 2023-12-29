@@ -31,10 +31,9 @@ public:
   void setZLineShapes(TH1 *hZPass, TH1 *hZFail );
   void setWorkspace(std::vector<std::string>, bool isaddGaus=false);
   void setOutputFile(TFile *fOut ) {_fOut = fOut;}
-  void fits(bool mcTruth,bool isMC,std::string title = "", bool isaddGaus=false);
+  void fits(std::string title = "", bool isaddGaus=false); 
   void useMinos(bool minos = true) {_useMinos = minos;}
   void textParForCanvas(RooFitResult *resP, RooFitResult *resF, TPad *p);
-  
   void fixSigmaFtoSigmaP(bool fix=true) { _fixSigmaFtoSigmaP= fix;}
 
   void setFitRange(double xMin,double xMax) { _xFitMin = xMin; _xFitMax = xMax; }
@@ -57,8 +56,6 @@ tnpFitter::tnpFitter(TFile *filein, std::string histname   ) : _useMinos(false),
   TH1 *hFail = (TH1*) filein->Get(TString::Format("%s_Fail",histname.c_str()).Data());
   _nTotP = hPass->Integral();
   _nTotF = hFail->Integral();
-  /// MC histos are done between 50-130 to do the convolution properly
-  /// but when doing MC fit in 60-120, need to zero bins outside the range
   for( int ib = 0; ib <= hPass->GetXaxis()->GetNbins()+1; ib++ )
    if(  hPass->GetXaxis()->GetBinCenter(ib) <= 60 || hPass->GetXaxis()->GetBinCenter(ib) >= 120 ) {
      hPass->SetBinContent(ib,0);
@@ -82,8 +79,6 @@ tnpFitter::tnpFitter(TH1 *hPass, TH1 *hFail, std::string histname  ) : _useMinos
   
   _nTotP = hPass->Integral();
   _nTotF = hFail->Integral();
-  /// MC histos are done between 50-130 to do the convolution properly
-  /// but when doing MC fit in 60-120, need to zero bins outside the range
   for( int ib = 0; ib <= hPass->GetXaxis()->GetNbins()+1; ib++ )
     if(  hPass->GetXaxis()->GetBinCenter(ib) <= 60 || hPass->GetXaxis()->GetBinCenter(ib) >= 120 ) {
       hPass->SetBinContent(ib,0);
@@ -101,8 +96,6 @@ tnpFitter::tnpFitter(TH1 *hPass, TH1 *hFail, std::string histname  ) : _useMinos
   _xFitMax = 120;
   
 }
-
-
 void tnpFitter::setZLineShapes(TH1 *hZPass, TH1 *hZFail ) {
   RooDataHist rooPass("hGenZPass","hGenZPass",*_work->var("x"),hZPass);
   RooDataHist rooFail("hGenZFail","hGenZFail",*_work->var("x"),hZFail);
@@ -125,17 +118,11 @@ void tnpFitter::setWorkspace(std::vector<std::string> workspace, bool isaddGaus)
   _work->factory(TString::Format("nSigF[%f,0.5,%f]",_nTotF*0.9,_nTotF*1.5));
   _work->factory(TString::Format("nBkgF[%f,0.5,%f]",_nTotF*0.1,_nTotF*1.5));
   _work->factory("SUM::pdfPass(nSigP*sigPass,nBkgP*bkgPass)");
-  
-  if (isaddGaus) {
-    _work->factory("SUM::pdfFail(expr('sigFracF*nSigF',{sigFracF,nSigF})*sigFail,nBkgF*bkgFail, expr('(1.-sigFracF)*nSigF',{sigFracF,nSigF})*sigGaussFail)");
-  } 
-  else {
-    _work->factory("SUM::pdfFail(nSigF*sigFail,nBkgF*bkgFail)");
-  }
-  _work->Print();			         
+  _work->factory("SUM::pdfFail(nSigF*sigFail,nBkgF*bkgFail)");
+  _work->Print();                    
 }
 
-void tnpFitter::fits(bool mcTruth,bool isMC,string title, bool isaddGaus) {
+void tnpFitter::fits(string title, bool isaddGaus) {
 
   cout << " title : " << title << endl;
 
@@ -145,27 +132,11 @@ void tnpFitter::fits(bool mcTruth,bool isMC,string title, bool isaddGaus) {
   RooFitResult* resPass;  
   RooFitResult* resFail;
 
-  if( mcTruth ) {
-    _work->var("nBkgP")->setVal(0); _work->var("nBkgP")->setConstant();
-    _work->var("nBkgF")->setVal(0); _work->var("nBkgF")->setConstant();
-    if( _work->var("sosP")   ) { _work->var("sosP")->setVal(0);
-      _work->var("sosP")->setConstant(); }
-    if( _work->var("sosF")   ) { _work->var("sosF")->setVal(0);
-      _work->var("sosF")->setConstant(); }
-    if( _work->var("acmsP")  ) _work->var("acmsP")->setConstant();
-    if( _work->var("acmsF")  ) _work->var("acmsF")->setConstant();
-    if( _work->var("betaP")  ) _work->var("betaP")->setConstant();
-    if( _work->var("betaF")  ) _work->var("betaF")->setConstant();
-    if( _work->var("gammaP") ) _work->var("gammaP")->setConstant();
-    if( _work->var("gammaF") ) _work->var("gammaF")->setConstant();
-  }
-
   /// FC: seems to be better to change the actual range than using a fitRange in the fit itself (???)
   /// FC: I don't know why but the integral is done over the full range in the fit not on the reduced range
   _work->var("x")->setRange(_xFitMin,_xFitMax);
   _work->var("x")->setRange("fitMassRange",_xFitMin,_xFitMax);
-  if( isMC == 1 ) resPass = pdfPass->fitTo(*_work->data("hPass"), Minimizer("Minuit2", "MIGRAD"), Minos(_useMinos), Strategy(2), SumW2Error(kTRUE),Save(),Range("fitMassRange"));
-  else resPass = pdfPass->fitTo(*_work->data("hPass"), Minimizer("Minuit2", "MIGRAD"), Minos(_useMinos), Strategy(2), SumW2Error(kFALSE),Save(),Range("fitMassRange"));
+  resPass = pdfPass->fitTo(*_work->data("hPass"), Minimizer("Minuit2", "MIGRAD"), Minos(_useMinos), Strategy(2), SumW2Error(kFALSE),Save(),Range("fitMassRange"));
   //RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save());
   if( _fixSigmaFtoSigmaP ) {
     _work->var("sigmaF")->setVal( _work->var("sigmaP")->getVal() );
@@ -174,8 +145,7 @@ void tnpFitter::fits(bool mcTruth,bool isMC,string title, bool isaddGaus) {
 
   _work->var("sigmaF")->setVal(_work->var("sigmaP")->getVal());
   _work->var("sigmaF")->setRange(0.8* _work->var("sigmaP")->getVal(), 3.0* _work->var("sigmaP")->getVal());
-  if( isMC == 1 ) resFail = pdfFail->fitTo(*_work->data("hFail"), Minimizer("Minuit2", "MIGRAD"), Minos(_useMinos), Strategy(2), SumW2Error(kTRUE),Save(),Range("fitMassRange"));
-  else resFail = pdfFail->fitTo(*_work->data("hFail"), Minimizer("Minuit2", "MIGRAD"), Minos(_useMinos), Strategy(2), SumW2Error(kFALSE),Save(),Range("fitMassRange"));
+  resFail = pdfFail->fitTo(*_work->data("hFail"), Minimizer("Minuit2", "MIGRAD"), Minos(_useMinos), Strategy(2), SumW2Error(kFALSE),Save(),Range("fitMassRange"));
   //RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save());
 
   RooPlot *pPass = _work->var("x")->frame(60,120);
@@ -204,12 +174,7 @@ void tnpFitter::fits(bool mcTruth,bool isMC,string title, bool isaddGaus) {
   c.Write(TString::Format("%s_Canv",_histname_base.c_str()),TObject::kOverwrite);
   resPass->Write(TString::Format("%s_resP",_histname_base.c_str()),TObject::kOverwrite);
   resFail->Write(TString::Format("%s_resF",_histname_base.c_str()),TObject::kOverwrite);
-
-  
 }
-
-
-
 
 
 /////// Stupid parameter dumper /////////

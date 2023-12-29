@@ -1,5 +1,6 @@
 include "ROOT.pxi"
 import math
+import sys
 #from fitUtils import *
 
 ##################
@@ -61,13 +62,13 @@ def makePassFailHistograms( sample, flag, bindef, var ):
     tree = new TChain(sample.tree)
 
     for p in sample.path:
-        print ' adding rootfile: ', p
+        print ' adding rootfile : ', p
         tree.Add(str.encode(p))
-
+    
     if not sample.puTree is None:
         print ' - Adding weight tree: %s from file %s ' % (sample.weight.split('.')[0], sample.puTree)
         tree.AddFriend(sample.weight.split('.')[0],sample.puTree)
-
+ 
     #################################
     # Prepare hists, cuts and outfile
     #################################
@@ -85,18 +86,9 @@ def makePassFailHistograms( sample, flag, bindef, var ):
         hFail[ib].Sumw2()
 
         cuts = bindef['bins'][ib]['cut']
-        if sample.mcTruth :
-            cuts = '%s && mcTrue==1' % cuts
         if not sample.cut is None :
             cuts = '%s && %s' % (cuts,sample.cut)
-
-        if sample.isMC and not sample.weight is None:
-            cutBin = '( %s ) * %s ' % (cuts, sample.weight)
-            if sample.maxWeight < 999:
-                cutBin = '( %s ) * (%s < %f ? %s : 1.0 )' % (cuts, sample.weight,sample.maxWeight,sample.weight)
-        else:
-            cutBin = '%s' % cuts
-
+        cutBin = '%s' % cuts
         cutBinList.append(cutBin)
 
         bin_formulas.push_back(new TTreeFormula('%s_Selection' % bindef['bins'][ib]['name'], str.encode(cutBin), tree))

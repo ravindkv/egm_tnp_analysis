@@ -13,11 +13,7 @@ parser.add_argument('--checkBins'  , action='store_true'  , help = 'check  binin
 parser.add_argument('--createBins' , action='store_true'  , help = 'create bining definition')
 parser.add_argument('--createHists', action='store_true'  , help = 'create histograms')
 parser.add_argument('--sample'     , default='all'        , help = 'create histograms (per sample, expert only)')
-parser.add_argument('--altSig'     , action='store_true'  , help = 'alternate signal model fit')
-parser.add_argument('--addGaus'    , action='store_true'  , help = 'add gaussian to alternate signal model failing probe')
-parser.add_argument('--altBkg'     , action='store_true'  , help = 'alternate background model fit')
 parser.add_argument('--doFit'      , action='store_true'  , help = 'fit sample (sample should be defined in settings.py)')
-parser.add_argument('--mcSig'      , action='store_true'  , help = 'fit MC nom [to init fit parama]')
 parser.add_argument('--doPlot'     , action='store_true'  , help = 'plotting')
 parser.add_argument('--sumUp'      , action='store_true'  , help = 'sum up efficiencies')
 parser.add_argument('--iBin'       , dest = 'binNumber'   , type = int,  default=-1, help='bin number (to refit individual bin)')
@@ -83,9 +79,15 @@ tnpBins = pickle.load( open( '%s/bining.pkl'%(outputDirectory),'rb') )
 ####################################################################
 ##### Create Histograms
 ####################################################################
+sampleMC = tnpConf.samplesDef['mcNom']
+
+if sampleMC is None:
+    print '[tnpEGM_fitter, prelim checks]: MC sample not available... check your settings'
+    sys.exit(1)
 for s in tnpConf.samplesDef.keys():
     sample =  tnpConf.samplesDef[s]
     if sample is None: continue
+    setattr( sample, 'mcRef'     , sampleMC )
     setattr( sample, 'tree'     ,'%s/fitter_tree' % tnpConf.tnpTreeDir )
     setattr( sample, 'histFile' , '%s/%s_%s.root' % ( outputDirectory , sample.name, args.flag ) )
 
@@ -101,8 +103,6 @@ if args.createHists:
             print 'creating histogram for sample '
             sample.dump()
             var = { 'name' : 'pair_mass', 'nbins' : 80, 'min' : 50, 'max': 130 }
-            if sample.mcTruth:
-                var = { 'name' : 'pair_mass', 'nbins' : 80, 'min' : 50, 'max': 130 }
             tnpHist.makePassFailHistograms( sample, tnpConf.flags[args.flag], tnpBins, var )
     
     pool = Pool()
@@ -116,40 +116,19 @@ if args.createHists:
 ####################################################################
 sampleToFit = tnpConf.samplesDef['data']
 if sampleToFit is None:
-    print '[tnpEGM_fitter, prelim checks]: sample (data or MC) not available... check your settings'
+    print '[tnpEGM_fitter, prelim checks]: sample (data) not available... check your settings'
     sys.exit(1)
 
-sampleMC = tnpConf.samplesDef['mcNom']
-
-if sampleMC is None:
-    print '[tnpEGM_fitter, prelim checks]: MC sample not available... check your settings'
-    sys.exit(1)
 for s in tnpConf.samplesDef.keys():
     sample =  tnpConf.samplesDef[s]
     if sample is None: continue
-    setattr( sample, 'mcRef'     , sampleMC )
     setattr( sample, 'nominalFit', '%s/%s_%s.nominalFit.root' % ( outputDirectory , sample.name, args.flag ) )
-    setattr( sample, 'altSigFit' , '%s/%s_%s.altSigFit.root'  % ( outputDirectory , sample.name, args.flag ) )
-    setattr( sample, 'altBkgFit' , '%s/%s_%s.altBkgFit.root'  % ( outputDirectory , sample.name, args.flag ) )
-
-
-
-### change the sample to fit is mc fit
-if args.mcSig :
-    sampleToFit = tnpConf.samplesDef['mcNom']
 
 if  args.doFit:
     sampleToFit.dump()
     def parallel_fit(ib):
         if (args.binNumber >= 0 and ib == args.binNumber) or args.binNumber < 0:
-            if args.altSig and not args.addGaus:
-                tnpRoot.histFitterAltSig(  sampleToFit, tnpBins['bins'][ib], tnpConf.tnpParAltSigFit )
-            elif args.altSig and args.addGaus:
-                tnpRoot.histFitterAltSig(  sampleToFit, tnpBins['bins'][ib], tnpConf.tnpParAltSigFit_addGaus, 1)
-            elif args.altBkg:
-                tnpRoot.histFitterAltBkg(  sampleToFit, tnpBins['bins'][ib], tnpConf.tnpParAltBkgFit )
-            else:
-                tnpRoot.histFitterNominal( sampleToFit, tnpBins['bins'][ib], tnpConf.tnpParNomFit )
+            tnpRoot.histFitterNominal( sampleToFit, tnpBins['bins'][ib], tnpConf.tnpParNomFit )
     pool = Pool()
     pool.map(parallel_fit, range(len(tnpBins['bins'])))
 
@@ -161,13 +140,6 @@ if  args.doFit:
 if  args.doPlot:
     fileName = sampleToFit.nominalFit
     fitType  = 'nominalFit'
-    if args.altSig : 
-        fileName = sampleToFit.altSigFit
-        fitType  = 'altSigFit'
-    if args.altBkg : 
-        fileName = sampleToFit.altBkgFit
-        fitType  = 'altBkgFit'
-        
     os.system('hadd -f %s %s' % (fileName, fileName.replace('.root', '-*.root')))
 
     plottingDir = '%s/plots/%s/%s' % (outputDirectory,sampleToFit.name,fitType)
@@ -191,17 +163,8 @@ if args.sumUp:
     info = {
         'data'        : sampleToFit.histFile,
         'dataNominal' : sampleToFit.nominalFit,
-        'dataAltSig'  : sampleToFit.altSigFit ,
-        'dataAltBkg'  : sampleToFit.altBkgFit ,
         'mcNominal'   : sampleToFit.mcRef.histFile,
-        'mcAlt'       : None,
-        'tagSel'      : None
         }
-
-    #if not tnpConf.samplesDef['mcAlt' ] is None:
-    #    info['mcAlt'    ] = tnpConf.samplesDef['mcAlt' ].histFile
-    if not tnpConf.samplesDef['tagSel'] is None:
-        info['tagSel'   ] = tnpConf.samplesDef['tagSel'].histFile
 
     effis = None
     effFileName ='%s/egammaEffi.txt' % outputDirectory 
@@ -221,15 +184,10 @@ if args.sumUp:
             print astr
             fOut.write( astr + '\n' )
             
-        astr =  '%+8.5f\t%+8.5f\t%+8.5f\t%+8.5f\t%5.5f\t%5.5f\t%5.5f\t%5.5f\t%5.5f\t%5.5f\t%5.5f\t%5.5f' % (
+        astr =  '%+8.5f\t%+8.5f\t%+8.5f\t%+8.5f\t%5.5f\t%5.5f' % (
             float(v1Range[0]), float(v1Range[2]),
             float(v2Range[0]), float(v2Range[2]),
             effis['dataNominal'][0],effis['dataNominal'][1],
-            effis['mcNominal'  ][0],effis['mcNominal'  ][1],
-            effis['dataAltBkg' ][0],
-            effis['dataAltSig' ][0],
-            effis['mcAlt' ][0],
-            effis['tagSel'][0],
             )
         print astr
         fOut.write( astr + '\n' )
