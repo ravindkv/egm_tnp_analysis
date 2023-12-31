@@ -43,13 +43,11 @@ def histFitterNominal( sample, tnpBin, tnpWorkspaceParam ):
     fitter = tnpFitter( hP, hF, tnpBin['name'] )
     infile.Close()
     
-    print("AAAA")
     ## setup
     fitter.useMinos()
     rootpath = sample.nominalFit.replace('.root', '-%s.root' % tnpBin['name'])
     rootfile = rt.TFile(rootpath,'update')
     fitter.setOutputFile( rootfile )
-    print("BBBB")
     
     ## generated Z LineShape
     ## for high pT change the failing spectra to any probe to get statistics

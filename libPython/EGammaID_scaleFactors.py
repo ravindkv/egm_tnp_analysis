@@ -78,23 +78,19 @@ def findMinMax( effis ):
     
 
 def EffiGraph1D(effDataList,nameout, xAxis = 'pT', yAxis = 'eta'):
-            
-    W = 800
+    W = 600
     H = 800
     yUp = 0.05
     canName = 'toto' + xAxis
 
     c = rt.TCanvas(canName,canName,50,50,H,W)
     c.SetTopMargin(0.055)
-    c.SetBottomMargin(0.10)
-    c.SetLeftMargin(0.12)
+    c.SetBottomMargin(0.15)
+    c.SetLeftMargin(0.15)
+    c.cd()
     
-    p1 = rt.TPad( canName + '_up', canName + '_up', 0, yUp, 1,   1, 0,0,0)
-    p1.SetBottomMargin(0.0075)
-    p1.SetTopMargin(   c.GetTopMargin()*1/(1-yUp))
-    p1.SetLeftMargin( c.GetLeftMargin() )
     firstGraph = True
-    leg = rt.TLegend(0.5,0.80,0.95 ,0.92)
+    leg = rt.TLegend(0.5,0.80,0.85 ,0.92)
     leg.SetFillColor(0)
     leg.SetBorderSize(0)
 
@@ -104,13 +100,16 @@ def EffiGraph1D(effDataList,nameout, xAxis = 'pT', yAxis = 'eta'):
     xMin = 10
     xMax = 200
     if 'pT' in xAxis or 'pt' in xAxis:
-        p1.SetLogx()
+        c.SetLogx()
         xMin = 10
         xMax = 500
     elif 'vtx' in xAxis or 'Vtx' in xAxis or 'PV' in xAxis:
         xMin =  3
         xMax = 42
     elif 'eta' in xAxis or 'Eta' in xAxis:
+        xMin = -2.60
+        xMax = +2.60
+    elif 'phi' in xAxis or 'Phi' in xAxis:
         xMin = -2.60
         xMax = +2.60
     
@@ -136,12 +135,23 @@ def EffiGraph1D(effDataList,nameout, xAxis = 'pT', yAxis = 'eta'):
         grBinsEffData.GetHistogram().GetYaxis().SetTitleOffset(1)
         grBinsEffData.GetHistogram().GetYaxis().SetTitle("Data efficiency" )
         grBinsEffData.GetHistogram().GetYaxis().SetRangeUser( effiMin, effiMax )
+        
+        grBinsEffData.GetHistogram().GetXaxis().SetTitleOffset(1)
+        if 'eta' in xAxis or 'Eta' in xAxis:
+            grBinsEffData.GetHistogram().GetXaxis().SetTitle("SuperCluster #eta")
+        if 'phi' in xAxis or 'Phi' in xAxis:
+            grBinsEffData.GetHistogram().GetXaxis().SetTitle("Electron #phi")
+        elif 'pt' in xAxis or 'pT' in xAxis:
+            grBinsEffData.GetHistogram().GetXaxis().SetTitle("Electron p_{T}  [GeV]")  
+        elif 'vtx' in xAxis or 'Vtx' in xAxis or 'PV' in xAxis:
+            grBinsEffData.GetHistogram().GetXaxis().SetTitle("N_{vtx}") 
 
-            
         ### to avoid loosing the TGraph keep it in memory by adding it to a list
         listOfTGraph1.append( grBinsEffData )
         if 'eta' in yAxis or 'Eta' in yAxis:
             leg.AddEntry( grBinsEffData, '%1.3f #leq | #eta | #leq  %1.3f' % (float(key[0]),float(key[1])), "PL")        
+        elif 'phi' in yAxis or 'Phi' in yAxis:
+            leg.AddEntry( grBinsEffData, '%1.3f #leq | #phi | #leq  %1.3f' % (float(key[0]),float(key[1])), "PL")        
         elif 'pt' in yAxis or 'pT' in yAxis:
             leg.AddEntry( grBinsEffData, '%3.0f #leq p_{T} #leq  %3.0f GeV' % (float(key[0]),float(key[1])), "PL")        
         elif 'vtx' in yAxis or 'Vtx' in yAxis or 'PV' in yAxis:
@@ -162,11 +172,10 @@ def EffiGraph1D(effDataList,nameout, xAxis = 'pT', yAxis = 'eta'):
 
         listOfTGraph1[use_igr].GetHistogram().SetMinimum(effiMin)
         listOfTGraph1[use_igr].GetHistogram().SetMaximum(effiMax)
-        p1.cd()
+        if 'pT' in xAxis or 'pt' in xAxis :
+            listOfTGraph1[use_igr].GetHistogram().GetXaxis().SetMoreLogLabels()
+        listOfTGraph1[use_igr].GetHistogram().GetXaxis().SetNoExponent()
         listOfTGraph1[use_igr].Draw(option)
-
-    c.cd()
-    p1.Draw()
 
     leg.Draw()    
     CMS_lumi.CMS_lumi(c, 5, 10)
@@ -197,7 +206,6 @@ def doEGM_SFs(filein, lumi, axis = ['pT','eta'] ):
     for line in fileWithEff :
         modifiedLine = line.lstrip(' ').rstrip(' ').rstrip('\n')
         numbers = modifiedLine.split('\t')
-        print(numbers)
         if len(numbers) > 0 and isFloat(numbers[0]):
             etaKey = ( float(numbers[0]), float(numbers[1]) )
             ptKey  = ( float(numbers[2]), min(500,float(numbers[3])) )
@@ -209,11 +217,18 @@ def doEGM_SFs(filein, lumi, axis = ['pT','eta'] ):
     fileWithEff.close()
 
     customEtaBining = []
-    customEtaBining.append( (0.000,0.800))
-    customEtaBining.append( (0.800,1.444))
-#    customEtaBining.append( (1.444,1.566))
-    customEtaBining.append( (1.566,2.000))
-    customEtaBining.append( (2.000,2.500))
+    if 'eta' in  axis[1]:
+        customEtaBining.append( (0.000,0.800))
+        customEtaBining.append( (0.800,1.444))
+        customEtaBining.append( (1.566,2.000))
+        customEtaBining.append( (2.000,2.500))
+    else:
+        customEtaBining.append( (0.000,1.000))
+        customEtaBining.append( (1.000,1.566))
+        customEtaBining.append( (1.566,2.000))
+        customEtaBining.append( (2.000,3.000))
+    print("customBining = ", customEtaBining)
+
 
     pdfout = nameOutBase + '_egammaPlots.pdf'
     cDummy = rt.TCanvas()

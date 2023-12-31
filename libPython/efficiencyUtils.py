@@ -26,9 +26,13 @@ class efficiency:
         
         ptbin  = self.ptBin
         etabin = self.etaBin
-        errData2 = 1.0 / (1.0/(self.errEffData*self.errEffData)+1.0/(eff.errEffData*eff.errEffData))
-        wData1   = 1.0 / (self.errEffData * self.errEffData) * errData2
-        wData2   = 1.0 / (eff .errEffData * eff .errEffData) * errData2
+        e1 = self.errEffData
+        e2 = eff.errEffData
+        if e1 == 0.0: e1 = 0.000001  #settting very ssmall unc to avoid devision by zero
+        if e2 == 0.0: e2 = 0.000001
+        errData2 = 1.0 / (1.0/(e1*e1)+1.0/(e2*e2))
+        wData1   = 1.0 / (e1 * e1) * errData2
+        wData2   = 1.0 / (e2 * e2) * errData2
         newEffData      = wData1 * self.effData + wData2 * eff.effData;
         newErrEffData   = math.sqrt(errData2)
         effout = efficiency(ptbin,etabin,newEffData,newErrEffData)
@@ -109,14 +113,11 @@ class efficiencyList:
         listOfGraphs = {}
         for abin in etaBining:
             listOfGraphs[abin] = []
-            print(self.effList.keys())
             for ptBin in self.effList.keys():
                 for etaBin in self.effList[ptBin].keys():
-                    print(ptBin, etaBin)
                     if etaBin[0] >= 0 and etaBin[1] > 0:
                         etaBinPlus  = etaBin
                         etaBinMinus = (-etaBin[1],-etaBin[0])
-
                         if abin[0] < etaBin[0] or abin[1] > etaBin[1]:
                             continue
                         #                        if abin[0] >= etaBin[0] and abin[1] <= etaBin[1]:

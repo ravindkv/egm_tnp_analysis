@@ -19,14 +19,17 @@ parser.add_argument('--sumUp'      , action='store_true'  , help = 'sum up effic
 parser.add_argument('--iBin'       , dest = 'binNumber'   , type = int,  default=-1, help='bin number (to refit individual bin)')
 parser.add_argument('--flag'       , default = None       , help ='WP to test')
 parser.add_argument('settings'     , default = None       , help = 'setting file [mandatory]')
+parser.add_argument('--binDef'  , default = None , type=str, help='String representation of a list')
 
 
 args = parser.parse_args()
-
 print '===> settings %s <===' % args.settings
 importSetting = 'import %s as tnpConf' % args.settings.replace('/','.').split('.py')[0]
 print importSetting
 exec(importSetting)
+binDef = args.binDef
+if binDef is None:
+    binDef  = tnpConf.biningDef
 
 ### tnp library
 import libPython.binUtils  as tnpBiner
@@ -54,7 +57,7 @@ print outputDirectory
 ##### Create (check) Bins
 ####################################################################
 if args.checkBins:
-    tnpBins = tnpBiner.createBins(tnpConf.biningDef,tnpConf.cutBase)
+    tnpBins = tnpBiner.createBins(binDef,tnpConf.cutBase)
     tnpBiner.tuneCuts( tnpBins, tnpConf.additionalCuts )
     for ib in range(len(tnpBins['bins'])):
         print tnpBins['bins'][ib]['name']
@@ -65,7 +68,7 @@ if args.createBins:
     if os.path.exists( outputDirectory ):
             shutil.rmtree( outputDirectory )
     os.makedirs( outputDirectory )
-    tnpBins = tnpBiner.createBins(tnpConf.biningDef,tnpConf.cutBase)
+    tnpBins = tnpBiner.createBins(binDef,tnpConf.cutBase)
     tnpBiner.tuneCuts( tnpBins, tnpConf.additionalCuts )
     pickle.dump( tnpBins, open( '%s/bining.pkl'%(outputDirectory),'wb') )
     print 'created dir: %s ' % outputDirectory
@@ -195,4 +198,5 @@ if args.sumUp:
 
     print 'Effis saved in file : ',  effFileName
     import libPython.EGammaID_scaleFactors as egm_sf
-    egm_sf.doEGM_SFs(effFileName,sampleToFit.lumi)
+    axis = [binDef[1]['var'], binDef[0]['var']]
+    egm_sf.doEGM_SFs(effFileName,sampleToFit.lumi, axis)

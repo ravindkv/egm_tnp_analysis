@@ -22,9 +22,10 @@ flags = {
     'passHltEle23Ele12CaloIdLTrackIdLIsoVLLeg1L1match'  : '(passHltEle23Ele12CaloIdLTrackIdLIsoVLLeg1L1match== 1)',
     'passHltEle23Ele12CaloIdLTrackIdLIsoVLLeg2'  : '(passHltEle23Ele12CaloIdLTrackIdLIsoVLLeg2== 1)',
     'passHltDoubleEle33CaloIdLMWUnsLeg'  : '(passHltDoubleEle33CaloIdLMWUnsLeg== 1)',
+    'passHLTEle30WPTightGsfOneOEMinusOneOPFilter'  : '(passHLTEle30WPTightGsfOneOEMinusOneOPFilter== 1)',
     }
 
-baseOutDir = 'results/Prompt2022/tnpEleTrig/'
+baseOutDir = 'results/Prompt2023/tnpEleTrig/'
 
 #############################################################
 ########## samples definition  - preparing the samples
@@ -35,7 +36,7 @@ import etc.inputs.tnpSampleDef as tnpSamples
 tnpTreeDir = 'tnpEleTrig'
 
 samplesDef = {
-    'data'   : tnpSamples.Prompt2022['data_Run2022C'].clone(),
+    'data'   : tnpSamples.Prompt2023['data_Run2023D'].clone(),
     'mcNom'  : tnpSamples.Prompt2022['DY_amcatnloext'].clone(),
 }
 
@@ -58,11 +59,9 @@ if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('/eos/cms/s
 ########## bining definition  [can be nD bining]
 #############################################################
 biningDef = [
-   { 'var' : 'el_pt' , 'type': 'float', 'bins': [10,40,100,300,500] },
-  { 'var' : 'el_phi' , 'type': 'float', 'bins': [-2.5,-1.566,-1.4442, 0.0, 1.4442, 1.566, 2.5] },
-  #{ 'var' : 'el_sc_eta' , 'type': 'float', 'bins': [-2.5,-1.566,-1.4442, 0.0, 1.4442, 1.566, 2.5] },
-  #{ 'var' : 'el_sc_eta' , 'type': 'float', 'bins': [-2.5,-2.0,-1.566,-1.4442, -0.8, 0.0, 0.8, 1.4442, 1.566, 2.0, 2.5] },
-   #{ 'var' : 'el_pt' , 'type': 'float', 'bins': [10,25,30,35,40,45,50,60,80,100,150,200,250,300,350,400] },
+  { 'var' : 'el_phi' , 'type': 'float', 'bins':[ -3.0,-2.0,-1.566, -1.0, 0.0, 1.0, 1.566, 2.0, 3.0]},
+  #{ 'var' : 'el_eta' , 'type': 'float', 'bins':[-2.5,-2.0,-1.566,-1.4442, -0.8, 0.0, 0.8, 1.4442, 1.566, 2.0, 2.5] },
+   { 'var' : 'el_pt' , 'type': 'float', 'bins':[10,20,35,50,100,200,500]} 
 ]
 #############################################################
 ########## Cuts definition for all samples
