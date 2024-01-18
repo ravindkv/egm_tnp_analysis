@@ -199,4 +199,4 @@ if args.sumUp:
     print 'Effis saved in file : ',  effFileName
     import libPython.EGammaID_scaleFactors as egm_sf
     axis = [binDef[1]['var'], binDef[0]['var']]
-    egm_sf.doEGM_SFs(effFileName,sampleToFit.lumi, axis)
+    egm_sf.doEGM_SFs(outputDirectory, args.flag,  sampleToFit.lumi, axis)
